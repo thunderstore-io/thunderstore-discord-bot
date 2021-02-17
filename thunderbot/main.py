@@ -1,5 +1,4 @@
 import discord
-from discord import Enum
 from dotenv import load_dotenv
 import os
 from discord.ext import commands

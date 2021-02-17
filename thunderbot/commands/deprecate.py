@@ -1,10 +1,8 @@
 import asyncio
 import os
-
 from discord.ext import commands, tasks
 import requests
 import jwt
-
 from thunderbot.tools.stringDecode import base64_decode
 import json
 from fuzzywuzzy import process
@@ -45,7 +43,6 @@ class Deprecate(commands.Cog):
         if best is None:
             await ctx.send(f'Package ({arg}) not found')
         else:
-            print(best)
             num = NAME_LIST.index(best[0])
 
             checkmsg = await ctx.send(f'react with :white_check_mark: to depricate ( {best[0]} ) or'
@@ -58,7 +55,7 @@ class Deprecate(commands.Cog):
                 return user == ctx.author and (str(reaction.emoji) == '✅' or str(reaction.emoji) == '❎')
 
             try:
-                reaction, user = await self.client.wait_for('reaction_add', timeout=60.0,check = check )
+                reaction, user = await self.client.wait_for('reaction_add', timeout=60.0, check=check)
             except asyncio.TimeoutError:
                 await ctx.send('Command timed out', delete_after=20)
                 return
@@ -66,14 +63,8 @@ class Deprecate(commands.Cog):
                 await ctx.send('Canceled', delete_after=20)
                 return
 
-
-
             try:
                 r = thunderstore_get(best[0], ctx.author.id)
-                print(best[0])
-
-                print(r.status_code)
-                print(r.content)
                 if r.status_code != 200:
                     await ctx.send(f"<@!{ctx.author.id}>"
                                    "\n Command should be: !deprecate {Package Full Name} "
