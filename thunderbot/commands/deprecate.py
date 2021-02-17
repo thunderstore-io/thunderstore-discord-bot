@@ -16,9 +16,9 @@ PACKAGE_REFRESH_TIME = os.getenv("PACKAGE_REFRESH_TIME")
 NAME_LIST = []
 
 
-def thunderstore_get(packageName, userid):
+def thunderstore_get(packagename, userid):
     data = jwt.encode(
-        payload={"package": packageName, "user": userid},
+        payload={"package": packagename, "user": userid},
         key=USER_KEY,
         algorithm=USER_ALGORITHM,
         headers={"kid": API_KEY},
@@ -26,7 +26,6 @@ def thunderstore_get(packageName, userid):
     )
     header = {"content-type": "application/jwt"}
     response = requests.post(url + "/v1/bot/deprecate-mod/", data, headers=header)
-    print(url + "/v1/bot/deprecate-mod/")
     return response
 
 
@@ -43,7 +42,6 @@ class Deprecate(commands.Cog):
         if best is None:
             await ctx.send(f'Package ({arg}) not found')
         else:
-            num = NAME_LIST.index(best[0])
 
             checkmsg = await ctx.send(f'react with :white_check_mark: to depricate ( {best[0]} ) or'
                                       f' :negative_squared_cross_mark:  to cancel', delete_after=80)
