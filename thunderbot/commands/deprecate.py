@@ -15,6 +15,17 @@ USER_ALGORITHM = os.getenv("THUNDERSTORE_API_ALGORITHM")
 PACKAGE_REFRESH_TIME = os.getenv("PACKAGE_REFRESH_TIME")
 NAME_LIST = []
 
+if API_KEY is None:
+    raise Exception("Env var API_KEY not found")
+if url is None:
+    raise Exception("Env var THUNDERSTORE_API_URL not found")
+if USER_KEY is None:
+    raise Exception("Env var THUNDERSTORE_API_SECRET not found")
+if USER_ALGORITHM is None:
+    raise Exception("Env var THUNDERSTORE_API_ALGORITHM not found")
+if PACKAGE_REFRESH_TIME is None:
+    raise Exception("Env var PACKAGE_REFRESH_TIME not found")
+
 
 def thunderstore_get(packagename, userid):
     data = jwt.encode(
