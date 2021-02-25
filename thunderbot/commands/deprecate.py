@@ -49,13 +49,13 @@ class Deprecate(commands.Cog):
     async def deprecate(self, ctx, *, arg):
 
         query = arg
-        best = process.extractOne(query, NAME_LIST, score_cutoff=95)
+        best = process.extractOne(query, NAME_LIST)
         if best is None:
             await ctx.send(f'Package ({arg}) not found')
         else:
 
             checkmsg = await ctx.send(f'react with :white_check_mark: to depricate ( {best[0]} ) or'
-                                      f' :negative_squared_cross_mark:  to cancel', delete_after=80)
+                                      f' :negative_squared_cross_mark:  to cancel')
 
             await checkmsg.add_reaction('✅')
             await checkmsg.add_reaction('❎')
@@ -66,10 +66,10 @@ class Deprecate(commands.Cog):
             try:
                 reaction, user = await self.client.wait_for('reaction_add', timeout=60.0, check=check)
             except asyncio.TimeoutError:
-                await ctx.send('Command timed out', delete_after=20)
+                await ctx.send('Command timed out')
                 return
             if str(reaction.emoji) == '❎':
-                await ctx.send('Canceled', delete_after=20)
+                await ctx.send('Canceled')
                 return
 
             try:
