@@ -1,42 +1,21 @@
 import asyncio
-import os
-from discord.ext import commands, tasks
+from discord.ext import commands
 import requests
 import jwt
-from thunderbot.tools.stringDecode import base64_decode
-import json
+from thunderbot.tools import settings
 from fuzzywuzzy import process
-
-API_KEY = os.getenv("THUNDERSTORE_API_KEY_ID")
-USER_AGENT = 'Mozilla/5.0'
-url = os.getenv("THUNDERSTORE_API_URL")
-USER_KEY = base64_decode(os.getenv("THUNDERSTORE_API_SECRET"))
-USER_ALGORITHM = os.getenv("THUNDERSTORE_API_ALGORITHM")
-PACKAGE_REFRESH_TIME = os.getenv("PACKAGE_REFRESH_TIME")
-NAME_LIST = []
-
-if API_KEY is None:
-    raise Exception("Env var API_KEY not found")
-if url is None:
-    raise Exception("Env var THUNDERSTORE_API_URL not found")
-if USER_KEY is None:
-    raise Exception("Env var THUNDERSTORE_API_SECRET not found")
-if USER_ALGORITHM is None:
-    raise Exception("Env var THUNDERSTORE_API_ALGORITHM not found")
-if PACKAGE_REFRESH_TIME is None:
-    raise Exception("Env var PACKAGE_REFRESH_TIME not found")
 
 
 def thunderstore_get(packagename, userid):
     data = jwt.encode(
         payload={"package": packagename, "user": userid},
-        key=USER_KEY,
-        algorithm=USER_ALGORITHM,
-        headers={"kid": API_KEY},
+        key=settings.USER_KEY,
+        algorithm=settings.USER_ALGORITHM,
+        headers={"kid": settings.API_KEY},
 
     )
     header = {"content-type": "application/jwt"}
-    response = requests.post(url + "/v1/bot/deprecate-mod/", data, headers=header)
+    response = requests.post(settings.URL + "/v1/bot/deprecate-mod/", data, headers=header)
     return response
 
 
@@ -45,30 +24,34 @@ class Deprecate(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.command()
+    @commands.command(aliases=["Deprecate", "d", "D"], brief="Deprecates a package on thunderstore",
+                      help="Usage !deprecate (package)")
     async def deprecate(self, ctx, *, arg):
+
+        NAME_LIST = settings.NAME_LIST
+        PACKAGE_LIST = settings.PACKAGE_LIST
 
         query = arg
         best = process.extractOne(query, NAME_LIST)
         if best is None:
             await ctx.send(f'Package ({arg}) not found')
         else:
-
-            checkmsg = await ctx.send(f'react with :white_check_mark: to depricate ( {best[0]} ) or'
-                                      f' :negative_squared_cross_mark:  to cancel')
+            dex = NAME_LIST.index(best[0])
+            url = PACKAGE_LIST[dex]["package_url"]
+            checkmsg = await ctx.send(f'Deprecate ( {url} ) ?')
 
             await checkmsg.add_reaction('✅')
-            await checkmsg.add_reaction('❎')
+            await checkmsg.add_reaction('❌')
 
             def check(reaction, user):
-                return user == ctx.author and (str(reaction.emoji) == '✅' or str(reaction.emoji) == '❎')
+                return user == ctx.author and (str(reaction.emoji) == '✅' or str(reaction.emoji) == '❌')
 
             try:
                 reaction, user = await self.client.wait_for('reaction_add', timeout=60.0, check=check)
             except asyncio.TimeoutError:
                 await ctx.send('Command timed out')
                 return
-            if str(reaction.emoji) == '❎':
+            if str(reaction.emoji) == '❌':
                 await ctx.send('Canceled')
                 return
 
@@ -88,25 +71,6 @@ class Deprecate(commands.Cog):
             except:
                 await ctx.send("error with deprecate command")
                 print("error with deprecate command")
-
-    @commands.Cog.listener()
-    async def on_ready(self):
-        print(f'logged in as {self.client.user}')
-        self.getlist.start()
-
-    @commands.command()
-    async def reloadlist(self, ctx):
-        await self.getlist()
-        await ctx.send(f'Package list reloaded')
-
-    @tasks.loop(minutes=float(PACKAGE_REFRESH_TIME))
-    async def getlist(self):
-
-        header = {"content-type": "application/json"}
-        response = requests.get(url + "/v1/package/", headers=header)
-        API_LIST = json.loads(response.content)
-        for dict in API_LIST:
-            NAME_LIST.append(dict["full_name"])
 
 
 def setup(client):
