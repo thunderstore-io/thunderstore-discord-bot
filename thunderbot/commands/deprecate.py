@@ -27,7 +27,7 @@ class Deprecate(commands.Cog):
     @commands.command(aliases=["Deprecate", "d", "D"], brief="Deprecates a package on thunderstore",
                       help="Usage !deprecate (package)")
     async def deprecate(self, ctx, *, arg):
-
+        await ctx.trigger_typing()
         NAME_LIST = settings.NAME_LIST
         PACKAGE_LIST = settings.PACKAGE_LIST
 

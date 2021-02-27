@@ -10,6 +10,7 @@ class ModSearch(commands.Cog):
     @commands.command(aliases=["Search", "s", "S"], brief="Searches for a package on thunderstore and sends the url",
                       help="Usage !search (package)")
     async def search(self, ctx, *, arg):
+        await ctx.trigger_typing()
         NAME_LIST = settings.NAME_LIST
         PACKAGE_LIST = settings.PACKAGE_LIST
 
