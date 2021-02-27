@@ -6,7 +6,7 @@ from thunderbot.tools import settings
 from fuzzywuzzy import process
 
 
-def thunderstore_get(packagename, userid):
+async def thunderstore_get(packagename, userid):
     data = jwt.encode(
         payload={"package": packagename, "user": userid},
         key=settings.USER_KEY,
@@ -56,7 +56,7 @@ class Deprecate(commands.Cog):
                 return
 
             try:
-                r = thunderstore_get(best[0], ctx.author.id)
+                r = await thunderstore_get(best[0], ctx.author.id)
                 if r.status_code != 200:
                     await ctx.send(f"<@!{ctx.author.id}>"
                                    "\n Command should be: !deprecate {Package Full Name} "

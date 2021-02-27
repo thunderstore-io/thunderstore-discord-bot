@@ -15,7 +15,7 @@ class Thunderstore(commands.Cog):
         print(f'logged in as {self.client.user}')
         self.getlist.start()
 
-    @commands.command(aliases=["Reloadpackages","Reload","reload", "R", "r"], brief="Reloads the package cache ",
+    @commands.command(aliases=["Reloadpackages", "Reload", "reload", "R", "r"], brief="Reloads the package cache ",
                       help="Usage !reloadpackages")
     async def reloadpackages(self, ctx):
         await ctx.trigger_typing()
@@ -27,10 +27,10 @@ class Thunderstore(commands.Cog):
         await self.client.change_presence(activity=discord.Game(f'Refreshing Packages'))
         header = {"content-type": "application/json"}
         response = requests.get(settings.URL + "/v1/package/", headers=header)
-        PACKAGE_LIST = json.loads(response.content)
-        settings.PACKAGE_LIST = PACKAGE_LIST
+        package_list = json.loads(response.content)
+        settings.PACKAGE_LIST = package_list
         settings.NAME_LIST = []
-        for d in PACKAGE_LIST:
+        for d in package_list:
             settings.NAME_LIST.append(d["full_name"])
         await self.client.change_presence(activity=discord.Game(f'{len(settings.NAME_LIST)} total packages'))
 
