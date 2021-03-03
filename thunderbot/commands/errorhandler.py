@@ -12,7 +12,6 @@ class CommandErrorHandler(commands.Cog):
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
 
-
         # This prevents any commands with local handlers being handled here in on_command_error.
         if hasattr(ctx.command, 'on_error'):
             return
@@ -23,9 +22,7 @@ class CommandErrorHandler(commands.Cog):
             if cog._get_overridden_method(cog.cog_command_error) is not None:
                 return
 
-
         error = getattr(error, 'original', error)
-
 
         if isinstance(error, commands.DisabledCommand):
             await ctx.send(f'{ctx.command} has been disabled.')
@@ -36,17 +33,13 @@ class CommandErrorHandler(commands.Cog):
             except discord.HTTPException:
                 pass
 
-        elif isinstance(error,commands.CommandNotFound):
-            await ctx.send(f'Command not found please check spelling or use !help.')
-
+        # elif isinstance(error,commands.CommandNotFound):
+        # await ctx.send(f'Command not found please check spelling or use !help.')
 
         else:
             # All other Errors not returned come here. And we can just print the default TraceBack.
             print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
             traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
-
-
-
 
 
 def setup(client):

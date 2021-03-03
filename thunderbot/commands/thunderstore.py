@@ -28,7 +28,7 @@ class Thunderstore(commands.Cog):
         header = {"content-type": "application/json"}
         response = requests.get(settings.URL + "/v1/package/", headers=header)
         package_list = json.loads(response.content)
-        settings.PACKAGE_LIST = package_list
+        settings.PACKAGE_DICT = package_list
         settings.NAME_LIST = []
         for d in package_list:
             settings.NAME_LIST.append(d["full_name"])

@@ -6,10 +6,20 @@ from thunderbot.tools import settings
 
 intents = discord.Intents.all()
 
-client = commands.Bot(command_prefix="!", intents=intents)
+
+# todo change to thunderstore request when released
+def get_prefix(bot, msg):
+    if msg.guild.id in settings.SER_PREF:
+        p = settings.SER_PREF[msg.guild.id][0]
+        return p
+
+    return "!"
 
 
-@client.command(pass_context=True,hidden=True)
+client = commands.Bot(command_prefix=get_prefix, intents=intents)
+
+
+@client.command(pass_context=True, hidden=True)
 async def load(ctx, extension):
     client.load_extension(f'thunderbot.commands.{extension}')
 

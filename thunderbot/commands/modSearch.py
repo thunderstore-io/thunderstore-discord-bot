@@ -12,7 +12,7 @@ class ModSearch(commands.Cog):
     async def search(self, ctx, *, arg):
         await ctx.trigger_typing()
         NAME_LIST = settings.NAME_LIST
-        PACKAGE_LIST = settings.PACKAGE_LIST
+        PACKAGE_LIST = settings.PACKAGE_DICT
 
         query = arg
         best = process.extractOne(query, NAME_LIST)

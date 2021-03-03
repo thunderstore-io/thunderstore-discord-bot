@@ -29,7 +29,7 @@ class Deprecate(commands.Cog):
     async def deprecate(self, ctx, *, arg):
         await ctx.trigger_typing()
         NAME_LIST = settings.NAME_LIST
-        PACKAGE_LIST = settings.PACKAGE_LIST
+        PACKAGE_DICT = settings.PACKAGE_DICT
 
         query = arg
         best = process.extractOne(query, NAME_LIST)
@@ -37,7 +37,7 @@ class Deprecate(commands.Cog):
             await ctx.send(f'Package ({arg}) not found')
         else:
             dex = NAME_LIST.index(best[0])
-            url = PACKAGE_LIST[dex]["package_url"]
+            url = PACKAGE_DICT[dex]["package_url"]
             checkmsg = await ctx.send(f'Deprecate ( {url} ) ?')
 
             await checkmsg.add_reaction('✅')
