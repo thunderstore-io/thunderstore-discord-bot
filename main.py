@@ -7,8 +7,9 @@ from thunderbot.tools import settings
 intents = discord.Intents.all()
 
 
-# todo change to thunderstore request when released
 def get_prefix(bot, msg):
+    if msg.guild is None:
+        return "!"
     if msg.guild.id in settings.SER_PREF:
         p = settings.SER_PREF[msg.guild.id][0]
         return p

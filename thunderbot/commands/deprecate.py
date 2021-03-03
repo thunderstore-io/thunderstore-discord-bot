@@ -6,7 +6,7 @@ from thunderbot.tools import settings
 from fuzzywuzzy import process
 
 
-async def thunderstore_get(packagename, userid):
+async def thunderstore_get(packagename, userid,url):
     data = jwt.encode(
         payload={"package": packagename, "user": userid},
         key=settings.USER_KEY,
@@ -15,7 +15,7 @@ async def thunderstore_get(packagename, userid):
 
     )
     header = {"content-type": "application/jwt"}
-    response = requests.post(settings.URL + "/v1/bot/deprecate-mod/", data, headers=header)
+    response = requests.post(url + "/v1/bot/deprecate-mod/", data, headers=header)
     return response
 
 
@@ -27,9 +27,15 @@ class Deprecate(commands.Cog):
     @commands.command(aliases=["Deprecate", "d", "D"], brief="Deprecates a package on thunderstore",
                       help="Usage !deprecate (package)")
     async def deprecate(self, ctx, *, arg):
+        if ctx.guild is None:
+            await ctx.send("Please use command in a comunity server")
+            return
+        elif ctx.guild.id not in settings.SER_PREF:
+            await ctx.send("Please use command in a comunity server")
+            return
         await ctx.trigger_typing()
-        NAME_LIST = settings.NAME_LIST
-        PACKAGE_DICT = settings.PACKAGE_DICT
+        NAME_LIST = settings.SER_PREF[ctx.guild.id][3]
+        PACKAGE_DICT = settings.SER_PREF[ctx.guild.id][2]
 
         query = arg
         best = process.extractOne(query, NAME_LIST)
@@ -52,11 +58,11 @@ class Deprecate(commands.Cog):
                 await ctx.send('Command timed out')
                 return
             if str(reaction.emoji) == '❌':
-                await ctx.send('Canceled')
+                await ctx.send('Cancelled')
                 return
 
             try:
-                r = await thunderstore_get(best[0], ctx.author.id)
+                r = await thunderstore_get(best[0], ctx.author.id,settings.SER_PREF[ctx.guild.id][1])
                 if r.status_code != 200:
                     await ctx.send(f"<@!{ctx.author.id}>"
                                    "\n Command should be: !deprecate {Package Full Name} "
@@ -71,6 +77,34 @@ class Deprecate(commands.Cog):
             except:
                 await ctx.send("error with deprecate command")
                 print("error with deprecate command")
+
+    @commands.command(aliases=["SDeprecate","strictdeprecate"], brief="Deprecates a package on thunderstore", help="Usage !deprecate (package)")
+    async def sdeprecate(self, ctx, *, arg):
+        if ctx.guild is None:
+            await ctx.send("Please use command in a comunity server")
+            return
+        elif ctx.guild.id not in settings.SER_PREF:
+            await ctx.send("Please use command in a comunity server")
+            return
+        await ctx.trigger_typing()
+
+        query = arg
+        try:
+            r = await thunderstore_get(arg, ctx.author.id,settings.SER_PREF[ctx.guild.id][1])
+            if r.status_code != 200:
+                await ctx.send(f"<@!{ctx.author.id}>"
+                               "\n Command should be: !deprecate {Package Full Name} "
+                               "\nExample: !deprecate \"bbepis-BepInExPack\" "
+                               "\nAn error occurred while executing the command. "
+                               "\nDetails: "
+                               f"\n``` {r.content}```")
+
+            else:
+                await ctx.send(f"<@!{ctx.author.id}>\n"
+                               f"Package ({arg}) deprecated successfully!")
+        except:
+            await ctx.send("error with deprecate command")
+            print("error with deprecate command")
 
 
 def setup(client):

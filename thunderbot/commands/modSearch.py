@@ -10,9 +10,16 @@ class ModSearch(commands.Cog):
     @commands.command(aliases=["Search", "s", "S"], brief="Searches for a package on thunderstore and sends the url",
                       help="Usage !search (package)")
     async def search(self, ctx, *, arg):
+        if ctx.guild is None:
+            await ctx.send("Please use command in a comunity server")
+            return
+        elif ctx.guild.id not in settings.SER_PREF:
+            await ctx.send("Please use command in a comunity server")
+            return
+
         await ctx.trigger_typing()
-        NAME_LIST = settings.NAME_LIST
-        PACKAGE_LIST = settings.PACKAGE_DICT
+        NAME_LIST = settings.SER_PREF[ctx.guild.id][3]
+        PACKAGE_DICT = settings.SER_PREF[ctx.guild.id][2]
 
         query = arg
         best = process.extractOne(query, NAME_LIST)
@@ -20,7 +27,7 @@ class ModSearch(commands.Cog):
             await ctx.send(f'Package ({arg}) not found')
         else:
             dex = NAME_LIST.index(best[0])
-            url = PACKAGE_LIST[dex]["package_url"]
+            url = PACKAGE_DICT[dex]["package_url"]
             await ctx.send(url)
 
 

@@ -25,14 +25,19 @@ class Thunderstore(commands.Cog):
     @tasks.loop(minutes=float(settings.PACKAGE_REFRESH_TIME))
     async def getlist(self):
         await self.client.change_presence(activity=discord.Game(f'Refreshing Packages'))
+        total = 0
         header = {"content-type": "application/json"}
-        response = requests.get(settings.URL + "/v1/package/", headers=header)
-        package_list = json.loads(response.content)
-        settings.PACKAGE_DICT = package_list
-        settings.NAME_LIST = []
-        for d in package_list:
-            settings.NAME_LIST.append(d["full_name"])
-        await self.client.change_presence(activity=discord.Game(f'{len(settings.NAME_LIST)} total packages'))
+        for ser in settings.SER_PREF:
+            response = requests.get(settings.SER_PREF[ser][1] + "/v1/package/", headers=header)
+            package_list = json.loads(response.content)
+            settings.SER_PREF[ser][2] = package_list
+            settings.SER_PREF[ser][3] = []
+
+            for d in package_list:
+                settings.SER_PREF[ser][3].append(d["full_name"])
+            total += len(settings.SER_PREF[ser][3])
+
+        await self.client.change_presence(activity=discord.Game(f'{total} total packages'))
 
 
 def setup(client):
