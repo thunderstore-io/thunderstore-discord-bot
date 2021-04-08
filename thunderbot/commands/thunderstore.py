@@ -3,7 +3,7 @@ import discord
 from discord.ext import commands, tasks
 import json
 from thunderbot.tools import settings
-import time
+import asyncio
 
 
 class Thunderstore(commands.Cog):
@@ -41,7 +41,7 @@ class Thunderstore(commands.Cog):
                 for d in response:
                     settings.SER_PREF[ser][3].append(d["full_name"])
                 total += len(settings.SER_PREF[ser][3])
-            time.sleep(0.005)
+            await asyncio.sleep(0.005)
         except Exception as e:
             print("Error with package refresh")
             print(e)
