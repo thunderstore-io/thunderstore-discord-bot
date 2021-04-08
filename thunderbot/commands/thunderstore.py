@@ -1,9 +1,10 @@
+import aiohttp
 import discord
 from discord.ext import commands, tasks
-import requests
 import json
 from thunderbot.tools import settings
 import time
+
 
 class Thunderstore(commands.Cog):
 
@@ -29,17 +30,21 @@ class Thunderstore(commands.Cog):
         header = {"content-type": "application/json"}
         try:
             for ser in settings.SER_PREF:
-                response = requests.get(settings.SER_PREF[ser][1] + "/v1/package/", headers=header)
-                package_list = json.loads(response.content)
-                settings.SER_PREF[ser][2] = package_list
+
+                async with aiohttp.ClientSession(loop=self.client.loop) as session:
+                    async with session.get(settings.SER_PREF[ser][1] + "/v1/package/") as r:
+                        response = await r.json()
+
+                settings.SER_PREF[ser][2] = response
                 settings.SER_PREF[ser][3] = []
 
-                for d in package_list:
+                for d in response:
                     settings.SER_PREF[ser][3].append(d["full_name"])
                 total += len(settings.SER_PREF[ser][3])
-            time.sleep(5)
-        except:
+            time.sleep(0.005)
+        except Exception as e:
             print("Error with package refresh")
+            print(e)
             await self.client.change_presence(activity=discord.Game(f'Cannot connect to Thunderstore'))
 
         await self.client.change_presence(activity=discord.Game(f'{total} total packages'))
