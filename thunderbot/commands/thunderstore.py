@@ -3,7 +3,7 @@ from discord.ext import commands, tasks
 import requests
 import json
 from thunderbot.tools import settings
-
+import time
 
 class Thunderstore(commands.Cog):
 
@@ -16,7 +16,7 @@ class Thunderstore(commands.Cog):
         self.getlist.start()
 
     @commands.command(aliases=["Reloadpackages", "Reload", "reload", "R", "r"], brief="Reloads the package cache ",
-                      help="Usage !reloadpackages")
+                      help="Usage !reloadpackages",hidden=True)
     async def reloadpackages(self, ctx):
         await ctx.trigger_typing()
         await self.getlist()
@@ -37,6 +37,7 @@ class Thunderstore(commands.Cog):
                 for d in package_list:
                     settings.SER_PREF[ser][3].append(d["full_name"])
                 total += len(settings.SER_PREF[ser][3])
+            time.sleep(5)
         except:
             print("Error with package refresh")
             await self.client.change_presence(activity=discord.Game(f'Cannot connect to Thunderstore'))
