@@ -30,4 +30,5 @@ SER_PREF = {562704639141740588: ['!', 'https://thunderstore.io/api', [], []],  #
             806549677209944084: ['!', 'https://dsp.thunderstore.io/api', [], []],  # dsp
             807356896637354004: ['!', 'https://valheim.thunderstore.io/api', [], []],  # valh
             782438773690597389: ['!', 'https://gtfo.thunderstore.io/api', [], []],  # mtfo
+            903472928883093545: ['!', 'https://inscryption.thunderstore.io/api', [], []],  # Inscription
             293810842225606656: ['!', 'https://outward.thunderstore.io/api', [], []]}  # outward
